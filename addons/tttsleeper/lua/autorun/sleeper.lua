@@ -6,7 +6,7 @@ local sleeper_active = false
 
 local function ResetSleeper()
     --sleeper_active says whether or not there has been a sleeper already, it'll double to check whether there will be one at all in this round. Setting it to true will prevent one from being selected.
-	sleeper_active = #player.GetAll() < GetConVar("ttt_sleeper_minplayers"):GetInt() or math.random(100) >= GetConVar("ttt_sleeper_chance"):GetInt()
+    sleeper_active = #player.GetAll() < GetConVar("ttt_sleeper_minplayers"):GetInt() or math.random(100) >= GetConVar("ttt_sleeper_chance"):GetInt()
 end
 hook.Add("TTTBeginRound", "ResetSleeper", ResetSleeper)
 
@@ -33,13 +33,13 @@ local function sleeper()
             
             -- Hitman support or something
             hook.Call("SleeperHitman", GAMEMODE, ply)
-			if GetConVar("ttt_sleeper_warning"):GetBool() then
-			    for _, v in pairs( player.GetAll() ) do
+            if GetConVar("ttt_sleeper_warning"):GetBool() then
+                for _, v in pairs( player.GetAll() ) do
                     if v != ply then
                         v:ChatPrint("The Sleeper Traitor has awoken!")
                     end
                 end
-			end
+            end
         end
         sleeper_active = true
     end
