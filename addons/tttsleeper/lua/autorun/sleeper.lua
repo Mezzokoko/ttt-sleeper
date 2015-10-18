@@ -4,12 +4,6 @@ CreateConVar("ttt_sleeper_minplayers", 8)
 
 local sleeper_active = false
 
-local function ResetSleeper()
-    --sleeper_active says whether or not there has been a sleeper already, it'll double to check whether there will be one at all in this round. Setting it to true will prevent one from being selected.
-    sleeper_active = #player.GetAll() < GetConVar("ttt_sleeper_minplayers"):GetInt() or math.random(100) >= GetConVar("ttt_sleeper_chance"):GetInt()
-end
-hook.Add("TTTBeginRound", "ResetSleeper", ResetSleeper)
-
 local function sleeper()
     local alive_t = {}
     for _, v in pairs(player.GetAll()) do
@@ -31,9 +25,10 @@ local function sleeper()
             net.WriteUInt(ply:GetRole(), 2)
             net.Send(ply)
             
-            -- Hitman support or something
+            -- Hitman compatibility hook
             hook.Call("SleeperHitman", GAMEMODE, ply)
-            if GetConVar("ttt_sleeper_warning"):GetBool() then
+			
+            if GetConVar("ttt_sleeper_warning"):GetBool() then --imo warning the players of the sleeper traitor defeats the point of it, which is why it is disabled by default
                 for _, v in pairs( player.GetAll() ) do
                     if v != ply then
                         v:ChatPrint("The Sleeper Traitor has awoken!")
@@ -46,8 +41,7 @@ local function sleeper()
 end
 
 local function WinHook()
-   --if ttt_dbgwin:GetBool() then return WIN_NONE end
-   -- The Preventwin cvar wont work for now, will try n find a way to fix asap
+   if GetConVar("ttt_debug_preventwin"):GetBool() then return WIN_NONE end
 
    if GAMEMODE.MapWin == WIN_TRAITOR or GAMEMODE.MapWin == WIN_INNOCENT then
       local mw = GAMEMODE.MapWin
@@ -83,13 +77,6 @@ local function WinHook()
    return WIN_NONE
 end
 hook.Add("TTTCheckForWin", "WinHook", WinHook)
-
-local function onPlayerDeath(vic, inf, att)
-    sleeper()
-end
-hook.Add("PostPlayerDeath", "onPlayerDeath", onPlayerDeath)
-
-local function onPlayerDisconnect(ply)
-    sleeper()
-end
-hook.Add("PlayerDisconnected", "onPlayerDisconnect", onPlayerDisconnect)
+hook.Add("PostPlayerDeath", "onPlayerDeath", function(vic,inf,atk) sleeper() end)
+hook.Add("PlayerDisconnected", "onPlayerDisconnect", function(ply) sleeper() end)
+hook.Add("TTTBeginRound", "ResetSleeper", function() sleeper_active = #player.GetAll() < GetConVar("ttt_sleeper_minplayers"):GetInt() or math.random(100) > GetConVar("ttt_sleeper_chance"):GetInt() end)
