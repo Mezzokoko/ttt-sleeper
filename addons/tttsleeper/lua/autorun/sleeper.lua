@@ -1,6 +1,6 @@
-CreateConVar("ttt_sleeper_chance", "33")
-CreateConVar("ttt_sleeper_warning", "0")
-CreateConVar("ttt_sleeper_minplayers", "8")
+CreateConVar("ttt_sleeper_chance", 33)
+CreateConVar("ttt_sleeper_warning", 0)
+CreateConVar("ttt_sleeper_minplayers", 8)
 
 local sleeper_active = false
 
